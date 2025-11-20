@@ -117,7 +117,53 @@ The reference implementation is available at:
 
 ## 🚀 Quick Start
 
+### For End Users – Installing Firefox Developer Edition
+
+Want to use the always-updated Firefox Developer Edition on openSUSE? Follow these steps:
+
+#### Option 1: One-Click Install (Recommended)
+
+Click the button below to install Firefox Developer Edition directly:
+
+[![Install Firefox Developer Edition](https://img.shields.io/badge/Install-Firefox%20Developer%20Edition-orange?style=for-the-badge&logo=firefox)](https://software.opensuse.org/ymp/home:itachi_re/openSUSE_Tumbleweed/ff-dev-edition.ymp?base=openSUSE%3AFactory&query=ff-dev-edition)
+
+#### Option 2: Manual Repository Setup
+
+**For openSUSE Tumbleweed:**
+```bash
+# Add the repository
+sudo zypper addrepo https://download.opensuse.org/repositories/home:/itachi_re/openSUSE_Tumbleweed/home:itachi_re.repo
+
+# Refresh repositories
+sudo zypper refresh
+
+# Install Firefox Developer Edition
+sudo zypper install ff-dev-edition
+```
+
+#### Option 3: YaST GUI Method
+
+1. Open **YaST** → **Software Repositories**
+2. Click **Add** → **Community Repositories**
+3. Or manually add:
+   - **URL:** `https://download.opensuse.org/repositories/home:/itachi_re/openSUSE_Tumbleweed/`
+   - **Name:** `home:itachi_re`
+4. Click **OK** and refresh
+5. Open **YaST** → **Software Management**
+6. Search for `ff-dev-edition` and install
+
+#### Updating
+
+Once installed, Firefox Developer Edition will update automatically with your system:
+```bash
+sudo zypper update
+```
+
+---
+
 ### For Package Maintainers
+
+Want to create your own automated Firefox DevEdition package?
 
 1. **Fork this repository** (optional, if you want your own version tracker)
 2. **Configure your OBS package** using the `_service` file above
