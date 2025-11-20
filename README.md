@@ -3,6 +3,7 @@
 [![Update Check](https://github.com/itachi-re/ff-dev-obs/actions/workflows/update-version.yml/badge.svg)](https://github.com/itachi-re/ff-dev-obs/actions)
 [![OBS Package](https://img.shields.io/badge/OBS-home:itachi__re-blue?logo=opensuse)](https://build.opensuse.org/package/show/home:itachi_re/ff-dev-edition)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![build result](https://build.opensuse.org/projects/home:itachi_re/packages/ff-dev-edition/badge.svg?type=default)](https://build.opensuse.org/package/show/home:itachi_re/ff-dev-edition)
 
 **Automated version tracking & packaging for Firefox Developer Edition on openSUSE Build Service**
 
