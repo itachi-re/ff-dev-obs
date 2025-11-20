@@ -1,0 +1,51 @@
+name: Update Firefox DevEdition Version
+
+on:
+  schedule:
+    - cron: "0 */6 * * *"
+  workflow_dispatch:
+
+jobs:
+  update-devedition-version:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Fetch Firefox version metadata
+        run: |
+          curl -s https://product-details.mozilla.org/1.0/firefox_versions.json -o firefox.json
+
+      - name: Extract FIREFOX_DEVEDITION version
+        run: |
+          VERSION=$(jq -r '.FIREFOX_DEVEDITION' firefox.json)
+          echo "$VERSION" > NEW_VERSION
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+
+      - name: Compare with existing version file
+        run: |
+          if [ -f version ]; then
+            OLD=$(cat version)
+          else
+            OLD="none"
+          fi
+
+          echo "Old version: $OLD"
+          echo "New version: $VERSION"
+
+          if [ "$OLD" = "$VERSION" ]; then
+            echo "No update needed."
+            exit 0
+          fi
+
+          echo "$VERSION" > version
+
+      - name: Commit and push if changed
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "actions@github.com"
+          
+          git add version
+          git commit -m "Update DevEdition version to $VERSION" || exit 0
+          git push
