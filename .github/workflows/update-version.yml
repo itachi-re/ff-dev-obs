@@ -1,16 +1,24 @@
 name: Update Firefox DevEdition Version
 
 on:
+  # Run immediately when you push to main (good for testing)
+  push:
+    branches:
+      - main
+  # Run every 6 hours
   schedule:
-    - cron: "0 */6 * * *" # Runs every 6 hours
+    - cron: "0 */6 * * *"
+  # Allow manual run from Actions tab
   workflow_dispatch:
 
+# REQUIRED: This gives the token permission to commit changes
 permissions:
   contents: write
 
 jobs:
   update-devedition-version:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
@@ -21,36 +29,36 @@ jobs:
 
       - name: Extract FIREFOX_DEVEDITION version
         run: |
-          # Get version (e.g., 146.0b5)
           VERSION=$(jq -r '.FIREFOX_DEVEDITION' firefox.json)
+          echo "Found version: $VERSION"
           echo "VERSION=$VERSION" >> $GITHUB_ENV
-          
-          # Convert to RPM tilde format if needed (e.g., 146.0b5 -> 146.0~b5)
-          # This matches the format in your spec file
-          RPM_VERSION=$(echo "$VERSION" | sed 's/b/~b/')
-          echo "RPM_VERSION=$RPM_VERSION" >> $GITHUB_ENV
 
-      - name: Update Spec File
+      # (Optional) Add the logic to update the .spec file here if you used the previous solution
+      
+      - name: Check for changes
         run: |
-          # Read current version from spec to check if update is needed
-          CURRENT_VERSION=$(grep "^Version:" ff-dev-edition.spec | awk '{print $2}')
+          # If you are just updating a version file:
+          if [ -f version ]; then
+            OLD=$(cat version)
+          else
+            OLD="none"
+          fi
           
-          if [ "$CURRENT_VERSION" = "$RPM_VERSION" ]; then
-            echo "Version matches ($CURRENT_VERSION). No update needed."
+          if [ "$OLD" = "$VERSION" ]; then
+            echo "Version matches ($OLD). No update needed."
             echo "UPDATE_NEEDED=false" >> $GITHUB_ENV
           else
-            echo "Updating from $CURRENT_VERSION to $RPM_VERSION"
-            # Use sed to replace the Version: line in the spec file
-            sed -i "s/^Version:.*/Version:        $RPM_VERSION/" ff-dev-edition.spec
+            echo "$VERSION" > version
             echo "UPDATE_NEEDED=true" >> $GITHUB_ENV
           fi
 
-      - name: Commit and push if changed
+      - name: Commit and push
+        # Only run if we actually found a new version
         if: env.UPDATE_NEEDED == 'true'
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "actions@github.com"
           
-          git add ff-dev-edition.spec
-          git commit -m "Update DevEdition to $VERSION"
+          git add .
+          git commit -m "Update DevEdition version to $VERSION"
           git push
