@@ -2,13 +2,15 @@ name: Update Firefox DevEdition Version
 
 on:
   schedule:
-    - cron: "0 */6 * * *"
+    - cron: "0 */6 * * *" # Runs every 6 hours
   workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   update-devedition-version:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
@@ -19,33 +21,36 @@ jobs:
 
       - name: Extract FIREFOX_DEVEDITION version
         run: |
+          # Get version (e.g., 146.0b5)
           VERSION=$(jq -r '.FIREFOX_DEVEDITION' firefox.json)
-          echo "$VERSION" > NEW_VERSION
           echo "VERSION=$VERSION" >> $GITHUB_ENV
+          
+          # Convert to RPM tilde format if needed (e.g., 146.0b5 -> 146.0~b5)
+          # This matches the format in your spec file
+          RPM_VERSION=$(echo "$VERSION" | sed 's/b/~b/')
+          echo "RPM_VERSION=$RPM_VERSION" >> $GITHUB_ENV
 
-      - name: Compare with existing version file
+      - name: Update Spec File
         run: |
-          if [ -f version ]; then
-            OLD=$(cat version)
+          # Read current version from spec to check if update is needed
+          CURRENT_VERSION=$(grep "^Version:" ff-dev-edition.spec | awk '{print $2}')
+          
+          if [ "$CURRENT_VERSION" = "$RPM_VERSION" ]; then
+            echo "Version matches ($CURRENT_VERSION). No update needed."
+            echo "UPDATE_NEEDED=false" >> $GITHUB_ENV
           else
-            OLD="none"
+            echo "Updating from $CURRENT_VERSION to $RPM_VERSION"
+            # Use sed to replace the Version: line in the spec file
+            sed -i "s/^Version:.*/Version:        $RPM_VERSION/" ff-dev-edition.spec
+            echo "UPDATE_NEEDED=true" >> $GITHUB_ENV
           fi
-
-          echo "Old version: $OLD"
-          echo "New version: $VERSION"
-
-          if [ "$OLD" = "$VERSION" ]; then
-            echo "No update needed."
-            exit 0
-          fi
-
-          echo "$VERSION" > version
 
       - name: Commit and push if changed
+        if: env.UPDATE_NEEDED == 'true'
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "actions@github.com"
           
-          git add version
-          git commit -m "Update DevEdition version to $VERSION" || exit 0
+          git add ff-dev-edition.spec
+          git commit -m "Update DevEdition to $VERSION"
           git push
