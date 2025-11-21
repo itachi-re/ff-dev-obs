@@ -61,7 +61,15 @@ features and tools.
 %define progdir %{_prefix}/%_lib/ff-dev-edition
 
 %prep
-%gpg_verify %{SOURCE1} %{SOURCE2} %{SOURCE0}
+# 1. SECURITY CHECK: Verify the tarball manually
+# Create a temporary GPG home so we don't need root access
+export GNUPGHOME=$(mktemp -d)
+# Import the Mozilla keyring (Source2)
+gpg --import %{SOURCE2}
+# Verify the Signature (Source1) against the Tarball (Source0)
+gpg --verify %{SOURCE1} %{SOURCE0}
+# Clean up
+rm -rf "$GNUPGHOME"
 %autosetup -p1 -n firefox-%{major_version}
 # FIX WM CLASS (Keep this!)
 sed -i '/MOZ_APP_REMOTINGNAME=firefox-dev/d' browser/branding/aurora/configure.sh
