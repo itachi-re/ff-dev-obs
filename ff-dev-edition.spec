@@ -61,7 +61,7 @@ features and tools.
 
 %prep
 %autosetup -p1 -n firefox-%{major_version}
-
+%gpg_verify %{SOURCE1} %{SOURCE2} %{SOURCE0}
 # FIX WM CLASS (Keep this!)
 sed -i '/MOZ_APP_REMOTINGNAME=firefox-dev/d' browser/branding/aurora/configure.sh
 
