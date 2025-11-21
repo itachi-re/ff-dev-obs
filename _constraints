@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<constraints>
+  <hardware>
+    <disk>
+      <size unit="G">25</size>
+    </disk>
+    <physicalmemory>
+      <size unit="G">16</size>
+    </physicalmemory>
+    <jobs>8</jobs>
+  </hardware>
+  <hostlabel exclude="true">SLOW_CPU</hostlabel>
+</constraints>
