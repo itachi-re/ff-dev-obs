@@ -124,8 +124,8 @@ ac_add_options --enable-rust-simd
 ac_add_options --enable-update-channel=aurora
 ac_add_options --with-branding=browser/branding/aurora
 ac_add_options --with-ccache=sccache
-ac_add_options --with-google-location-service-api-keyfile=%{SOURCE2}
-ac_add_options --with-google-safebrowsing-api-keyfile=%{SOURCE3}
+ac_add_options --with-google-location-service-api-keyfile=%{SOURCE20}
+ac_add_options --with-google-safebrowsing-api-keyfile=%{SOURCE30}
 ac_add_options --with-system-zlib
 ac_add_options --with-unsigned-addon-scopes=app
 ac_add_options --without-wasm-sandboxed-libraries
@@ -138,7 +138,7 @@ sccache -s
 %install
 source ./.obsenv.sh
 
-install -Dm 0644 %{SOURCE1} %{buildroot}%{_datadir}/applications/ff-dev-edition.desktop
+install -Dm 0644 %{SOURCE10} %{buildroot}%{_datadir}/applications/ff-dev-edition.desktop
 
 DESTDIR="%{buildroot}" ./mach install
 
