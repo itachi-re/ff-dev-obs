@@ -36,6 +36,7 @@ BuildRequires:  cargo
 BuildRequires:  curl
 BuildRequires:  fdupes
 BuildRequires:  gcc-c++
+BuildRequires:  gpg-offline
 BuildRequires:  libXt-devel
 BuildRequires:  libproxy-devel
 BuildRequires:  nasm
