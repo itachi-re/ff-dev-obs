@@ -19,14 +19,14 @@ Version:        146.0b5
 %define cbin_ver  0.29.2
 %define cbin_rel  1
 # ---------------------------
-Source0:        https://ftp.mozilla.org/pub/devedition/releases/%{version}/source/firefox-%{version}.source.tar.xz
+Source0:       https://ftp.mozilla.org/pub/devedition/releases/%{version}/source/firefox-%{version}.source.tar.xz
 Source1:       https://ftp.mozilla.org/pub/devedition/releases/%{version}/source/firefox-%{version}.source.tar.xz.asc
 Source2:       https://ftp.mozilla.org/pub/devedition/releases/%{version}/KEY#/mozilla.keyring
-Source10:        ff-dev-edition.desktop
+Source10:      ff-dev-edition.desktop
 # Please create your own keys should you need them :)
-Source20:        google-geolocation-api-key
-Source30:        google-safe-browsing-api-key
-Source99:        https://archive.archlinux.org/packages/c/cbindgen/cbindgen-%{cbin_ver}-%{cbin_rel}-x86_64.pkg.tar.zst
+Source20:       google-geolocation-api-key
+Source30:       google-safe-browsing-api-key
+Source99:       https://archive.archlinux.org/packages/c/cbindgen/cbindgen-%{cbin_ver}-%{cbin_rel}-x86_64.pkg.tar.zst
 
 
 %define major_version %{lua: print((string.gsub(rpm.expand("%{version}"), "b%d+$", "")))}
