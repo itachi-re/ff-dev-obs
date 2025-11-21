@@ -60,8 +60,8 @@ features and tools.
 %define progdir %{_prefix}/%_lib/ff-dev-edition
 
 %prep
-%autosetup -p1 -n firefox-%{major_version}
 %gpg_verify %{SOURCE1} %{SOURCE2} %{SOURCE0}
+%autosetup -p1 -n firefox-%{major_version}
 # FIX WM CLASS (Keep this!)
 sed -i '/MOZ_APP_REMOTINGNAME=firefox-dev/d' browser/branding/aurora/configure.sh
 
