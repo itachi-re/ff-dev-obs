@@ -76,6 +76,13 @@ touch third_party/rust/cubeb-sys/libcubeb/.gitmodules
 
 # Fix Cargo's checksum registry so it accepts the empty file we just created
 sed -i 's/"libcubeb\/.gitmodules":"[^"]*"/"libcubeb\/.gitmodules":"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"/' third_party/rust/cubeb-sys/.cargo-checksum.json
+
+# Fix missing minimal-lexical submodule stub (absent in release tarballs)
+mkdir -p third_party/rust/minimal-lexical
+touch third_party/rust/minimal-lexical/.gitmodules
+
+# Fix Cargo's checksum registry so it accepts the empty file we just created
+sed -i 's/"minimal-lexical\/.gitmodules":"[^"]*"/"minimal-lexical\/.gitmodules":"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"/' third_party/rust/minimal-lexical/.cargo-checksum.json
 %build
 # --- AUTOMATED CBINDGEN SETUP ---
 # 1. Extract the Arch Linux package (it contains usr/bin/cbindgen)
