@@ -59,7 +59,6 @@ Firefox Developer Edition provides early access to the latest web development
 features and tools.
 
 %define progdir %{_prefix}/%_lib/ff-dev-edition
-
 %prep
 # 1. SECURITY CHECK: Verify the tarball manually
 export GNUPGHOME=$(mktemp -d)
@@ -82,7 +81,7 @@ mkdir -p third_party/rust/minimal-lexical
 touch third_party/rust/minimal-lexical/.gitmodules
 
 # Fix Cargo's checksum registry so it accepts the empty file we just created
-sed -i 's/"minimal-lexical\/.gitmodules":"[^"]*"/"minimal-lexical\/.gitmodules":"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"/' third_party/rust/minimal-lexical/.cargo-checksum.json
+sed -i 's/6976207a02c7160a3a1d076c5fae10fe4b78f58cdc0aa66ae47f3855b3c392fb/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855/g' third_party/rust/minimal-lexical/.cargo-checksum.json
 %build
 # --- AUTOMATED CBINDGEN SETUP ---
 # 1. Extract the Arch Linux package (it contains usr/bin/cbindgen)
