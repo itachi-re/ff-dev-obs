@@ -11,7 +11,7 @@ Summary:        Mozilla Firefox Web Browser (Developer Edition)
 URL:            https://www.firefox.com/en-US/channel/desktop/developer
 Group:          Productivity/Networking/Web/Browsers
 # --- 🦊 FIREFOX VERSION ---
-Version:        149.0b2
+Version:        149.0b3
 # --------------------------
 
 # --- 🦀 CBINDGEN VERSION ---
