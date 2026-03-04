@@ -65,23 +65,33 @@ export GNUPGHOME=$(mktemp -d)
 gpg --import %{SOURCE2}
 gpg --verify %{SOURCE1} %{SOURCE0}
 rm -rf "$GNUPGHOME"
+
 %autosetup -p1 -n firefox-%{major_version}
+
 # FIX WM CLASS (Keep this!)
 sed -i '/MOZ_APP_REMOTINGNAME=firefox-dev/d' browser/branding/aurora/configure.sh
 
-# Fix missing cubeb-sys submodule stub (absent in release tarballs)
+# --- RUST VENDOR FIXES ---
+# These submodules are often missing from release tarballs, causing Cargo checksum failures.
+# We create empty stubs and update the .cargo-checksum.json files with the SHA256 of an empty file.
+# Empty file SHA256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+
+# 1. Fix cubeb-sys
 mkdir -p third_party/rust/cubeb-sys/libcubeb
 touch third_party/rust/cubeb-sys/libcubeb/.gitmodules
-
-# Fix Cargo's checksum registry so it accepts the empty file we just created
 sed -i 's/"libcubeb\/.gitmodules":"[^"]*"/"libcubeb\/.gitmodules":"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"/' third_party/rust/cubeb-sys/.cargo-checksum.json
 
-# Fix missing minimal-lexical submodule stub (absent in release tarballs)
+# 2. Fix minimal-lexical
 mkdir -p third_party/rust/minimal-lexical
 touch third_party/rust/minimal-lexical/.gitmodules
+sed -i 's/"\.gitmodules":"[^"]*"/"\.gitmodules":"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"/' third_party/rust/minimal-lexical/.cargo-checksum.json
 
-# Fix Cargo's checksum registry so it accepts the empty file we just created
-sed -i 's/6976207a02c7160a3a1d076c5fae10fe4b78f58cdc0aa66ae47f3855b3c392fb/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855/g' third_party/rust/minimal-lexical/.cargo-checksum.json
+# 3. Fix sfv (The cause of the current build failure)
+mkdir -p third_party/rust/sfv
+touch third_party/rust/sfv/.gitmodules
+sed -i 's/"\.gitmodules":"[^"]*"/"\.gitmodules":"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"/' third_party/rust/sfv/.cargo-checksum.json
+
+# -------------------------
 %build
 # --- AUTOMATED CBINDGEN SETUP ---
 # 1. Extract the Arch Linux package (it contains usr/bin/cbindgen)
