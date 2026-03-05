@@ -90,7 +90,10 @@ sed -i 's/"\.gitmodules":"[^"]*"/"\.gitmodules":"e3b0c44298fc1c149afbf4c8996fb92
 mkdir -p third_party/rust/sfv
 touch third_party/rust/sfv/.gitmodules
 sed -i 's/"\.gitmodules":"[^"]*"/"\.gitmodules":"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"/' third_party/rust/sfv/.cargo-checksum.json
-
+# 4. Fix glslopt (The new cause of the current build failure)
+mkdir -p third_party/rust/glslopt
+touch third_party/rust/glslopt/.gitmodules
+sed -i 's/"\.gitmodules":"[^"]*"/"\.gitmodules":"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"/' third_party/rust/glslopt/.cargo-checksum.json
 # -------------------------
 %build
 # --- AUTOMATED CBINDGEN SETUP ---
