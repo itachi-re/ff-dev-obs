@@ -94,6 +94,10 @@ sed -i 's/"\.gitmodules":"[^"]*"/"\.gitmodules":"e3b0c44298fc1c149afbf4c8996fb92
 mkdir -p third_party/rust/glslopt
 touch third_party/rust/glslopt/.gitmodules
 sed -i 's/"\.gitmodules":"[^"]*"/"\.gitmodules":"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"/' third_party/rust/glslopt/.cargo-checksum.json
+# 5. Fix yaml-rust2
+mkdir -p third_party/rust/yaml-rust2
+touch third_party/rust/yaml-rust2/.gitmodules
+sed -i 's/"\.gitmodules":"[^"]*"/"\.gitmodules":"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"/' third_party/rust/yaml-rust2/.cargo-checksum.json
 # -------------------------
 %build
 # --- AUTOMATED CBINDGEN SETUP ---
