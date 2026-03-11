@@ -67,7 +67,9 @@ gpg --verify %{SOURCE1} %{SOURCE0}
 rm -rf "$GNUPGHOME"
 
 %autosetup -p1 -n firefox-%{major_version}
-
+# Fix cubeb-sys vendor checksum mismatch
+sed -i 's|"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"|"65c86aa240aea1d6cb8559a0db73839f9a2f0d7a93d143c5fba0c485396874a0"|g' \
+    third_party/rust/cubeb-sys/.cargo-checksum.json
 # FIX WM CLASS (Keep this!)
 sed -i '/MOZ_APP_REMOTINGNAME=firefox-dev/d' browser/branding/aurora/configure.sh
 
