@@ -67,10 +67,8 @@ gpg --verify %{SOURCE1} %{SOURCE0}
 rm -rf "$GNUPGHOME"
 
 %autosetup -p1 -n firefox-%{major_version}
-# Fix cubeb-sys vendor checksum mismatch (libcubeb/.gitmodules is non-empty in 149.0+)
-# This is the exact fix needed for 149.0b7 — the old sed was too weak and missed the quoted hash
-find third_party/rust -name .cargo-checksum.json -exec sed -i \
-  's/"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"/"65c86aa240aea1d6cb8559a0db73839f9a2f0d7a93d143c5fba0c485396874a0"/g' {} +
+# Fix vendored Rust crates where .gitmodules is non-empty but checksum expects empty file
+find third_party/rust -name ".gitmodules" -exec truncate -s 0 {} +
 # FIX WM CLASS
 sed -i '/MOZ_APP_REMOTINGNAME=firefox-dev/d' browser/branding/aurora/configure.sh
 
