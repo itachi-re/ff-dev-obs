@@ -67,6 +67,16 @@ gpg --verify %{SOURCE1} %{SOURCE0}
 rm -rf "$GNUPGHOME"
 
 %autosetup -p1 -n firefox-%{major_version}
+
+# Fix missing GetSystemProxyDirect implementation (new in FF151 nsISystemProxySettings)
+sed -i '/^NS_IMPL_ISUPPORTS(nsUnixSystemProxySettings/i \
+NS_IMETHODIMP\
+nsUnixSystemProxySettings::GetSystemProxyDirect(bool* aSystemProxyDirect)\
+{\
+  *aSystemProxyDirect = false;\
+  return NS_OK;\
+}\
+' toolkit/system/unixproxy/nsLibProxySettings.cpp
 # Fix vendored Rust crates where .gitmodules is non-empty but checksum expects empty file
 find third_party/rust -name ".gitmodules" -exec truncate -s 0 {} +
 # FIX WM CLASS
