@@ -125,14 +125,6 @@ echo "Using bootstrapped cbindgen version:"
 # -----------------------------
 # Recursion Fix: Filter flags safely using shell
 cat << EOF > .obsenv.sh
-export CC=clang-21
-export CXX=clang++-21
-export HOST_CC=clang-21
-export HOST_CXX=clang++-21
-export AR=llvm-ar-21
-export NM=llvm-nm-21
-export RANLIB=llvm-ranlib-21
-
 export CFLAGS=\$(echo "%{optflags}" | sed -e 's/-flto[^ ]*//g')
 export CXXFLAGS="\$CFLAGS"
 export LDFLAGS="\$LDFLAGS -fPIC -Wl,-z,relro,-z,now"
@@ -170,7 +162,7 @@ ac_add_options --enable-crashreporter
 ac_add_options --enable-default-toolkit=cairo-gtk3-wayland
 ac_add_options --enable-install-strip
 ac_add_options --enable-libproxy
-ac_add_options --enable-lto
+ac_add_options --disable-lto
 ac_add_options --enable-optimize
 ac_add_options --enable-release
 ac_add_options --enable-rust-simd
