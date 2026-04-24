@@ -125,7 +125,15 @@ echo "Using bootstrapped cbindgen version:"
 # -----------------------------
 # Recursion Fix: Filter flags safely using shell
 cat << EOF > .obsenv.sh
-export CFLAGS=\$(echo "%{optflags}" | sed -e 's/-flto=auto//')
+export CC=clang-21
+export CXX=clang++-21
+export HOST_CC=clang-21
+export HOST_CXX=clang++-21
+export AR=llvm-ar-21
+export NM=llvm-nm-21
+export RANLIB=llvm-ranlib-21
+
+export CFLAGS=\$(echo "%{optflags}" | sed -e 's/-flto[^ ]*//g')
 export CXXFLAGS="\$CFLAGS"
 export LDFLAGS="\$LDFLAGS -fPIC -Wl,-z,relro,-z,now"
 
