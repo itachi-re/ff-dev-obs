@@ -1,0 +1,74 @@
+name: Update Firefox DevEdition Version
+
+on:
+  # Run immediately when you push to main (testing)
+  push:
+    branches:
+      - main
+  # Run every 6 hours
+  schedule:
+    - cron: "0 */6 * * *"
+  # Allow manual run
+  workflow_dispatch:
+
+# REQUIRED: Gives permission to push changes back to the repo
+permissions:
+  contents: write
+
+jobs:
+  update-version:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Fetch latest version from Mozilla
+        id: fetch_version
+        run: |
+          # 1. Get JSON
+          curl -s https://product-details.mozilla.org/1.0/firefox_versions.json -o firefox.json
+          
+          # 2. Extract version (e.g., 146.0b5)
+          NEW_VERSION=$(jq -r '.FIREFOX_DEVEDITION' firefox.json)
+          
+          # 3. Convert to Tilde format if your spec uses it (e.g., 146.0~b5)
+          # Based on your spec file, you use "146.0b5" (no tilde), so we keep it as is.
+          echo "Detected latest version: $NEW_VERSION"
+          echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
+
+      - name: Check current spec version
+        id: check_version
+        run: |
+          # Extract the current version from the spec file
+          # This grabs the second word from the line starting with "Version:"
+          CURRENT_VERSION=$(grep "^Version:" ff-dev-edition.spec | awk '{print $2}')
+          echo "Current spec version: $CURRENT_VERSION"
+          
+          if [ "$CURRENT_VERSION" = "$NEW_VERSION" ]; then
+            echo "Version match. No update needed."
+            echo "UPDATE_NEEDED=false" >> $GITHUB_ENV
+          else
+            echo "New version found! Updating..."
+            echo "UPDATE_NEEDED=true" >> $GITHUB_ENV
+          fi
+
+      - name: Update Spec File
+        if: env.UPDATE_NEEDED == 'true'
+        run: |
+          # Use sed to replace the Version line
+          # This preserves the whitespace layout of your spec file
+          sed -i "s/^Version:\s\+.*/Version:        $NEW_VERSION/" ff-dev-edition.spec
+          
+          # Verify the change in the logs
+          grep "^Version:" ff-dev-edition.spec
+
+      - name: Commit and Push
+        if: env.UPDATE_NEEDED == 'true'
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          
+          git add ff-dev-edition.spec
+          git commit -m "Update Firefox DevEdition to $NEW_VERSION"
+          git push
