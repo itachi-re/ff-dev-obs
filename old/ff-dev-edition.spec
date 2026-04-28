@@ -5,28 +5,31 @@
 #
 
 Name:           ff-dev-edition
-Release:        1
+Release:        0
 License:        MPL-2.0
 Summary:        Mozilla Firefox Web Browser (Developer Edition)
 URL:            https://www.firefox.com/en-US/channel/desktop/developer
 Group:          Productivity/Networking/Web/Browsers
-ExclusiveArch:  x86_64
-
 # --- 🦊 FIREFOX VERSION ---
 Version:        151.0b3
 # --------------------------
 
-Source0:        https://ftp.mozilla.org/pub/devedition/releases/%{version}/source/firefox-%{version}.source.tar.xz
-Source1:        https://ftp.mozilla.org/pub/devedition/releases/%{version}/source/firefox-%{version}.source.tar.xz.asc
-###Source2:        https://ftp.mozilla.org/pub/devedition/releases/%{version}/KEY#/mozilla.keyring
-Source2: https://ftp.mozilla.org/pub/devedition/releases/%{version}/KEY#/mozilla.keyring
-Source10:       ff-dev-edition.desktop
+# --- 🦀 CBINDGEN VERSION ---
+# Update these two lines when a new version is available on Arch Linux Archive
+%define cbin_ver  0.29.2
+%define cbin_rel  1
+# ---------------------------
+Source0:       https://ftp.mozilla.org/pub/devedition/releases/%{version}/source/firefox-%{version}.source.tar.xz
+Source1:       https://ftp.mozilla.org/pub/devedition/releases/%{version}/source/firefox-%{version}.source.tar.xz.asc
+Source2:       https://ftp.mozilla.org/pub/devedition/releases/%{version}/KEY#/mozilla.keyring
+Source10:      ff-dev-edition.desktop
 # Please create your own keys should you need them :)
 Source20:       google-geolocation-api-key
 Source30:       google-safe-browsing-api-key
+Source99:       https://archive.archlinux.org/packages/c/cbindgen/cbindgen-%{cbin_ver}-%{cbin_rel}-x86_64.pkg.tar.zst
+
 
 %define major_version %{lua: print((string.gsub(rpm.expand("%{version}"), "b%d+$", "")))}
-
 BuildRequires:  alsa-devel
 BuildRequires:  clang-devel
 BuildRequires:  cargo
@@ -44,11 +47,10 @@ BuildRequires:  python3
 BuildRequires:  python3-curses
 BuildRequires:  python3-devel
 BuildRequires:  rust
-BuildRequires:  rust-cbindgen
+# BuildRequires:  rust-cbindgen
 BuildRequires:  sccache
 BuildRequires:  unzip
 BuildRequires:  zstd
-
 Requires(post):   desktop-file-utils
 Requires(postun): desktop-file-utils
 
@@ -57,7 +59,6 @@ Firefox Developer Edition provides early access to the latest web development
 features and tools.
 
 %define progdir %{_prefix}/%_lib/ff-dev-edition
-
 %prep
 # 1. SECURITY CHECK: Verify the tarball manually
 export GNUPGHOME=$(mktemp -d)
@@ -76,10 +77,8 @@ nsUnixSystemProxySettings::GetSystemProxyDirect(bool* aSystemProxyDirect)\
   return NS_OK;\
 }\
 ' toolkit/system/unixproxy/nsLibProxySettings.cpp
-
 # Fix vendored Rust crates where .gitmodules is non-empty but checksum expects empty file
 find third_party/rust -name ".gitmodules" -exec truncate -s 0 {} +
-
 # FIX WM CLASS
 sed -i '/MOZ_APP_REMOTINGNAME=firefox-dev/d' browser/branding/aurora/configure.sh
 
@@ -98,26 +97,32 @@ mkdir -p third_party/rust/minimal-lexical
 touch third_party/rust/minimal-lexical/.gitmodules
 sed -i 's/"\.gitmodules":"[^"]*"/"\.gitmodules":"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"/' third_party/rust/minimal-lexical/.cargo-checksum.json
 
-# 3. Fix sfv
+# 3. Fix sfv (The cause of the current build failure)
 mkdir -p third_party/rust/sfv
 touch third_party/rust/sfv/.gitmodules
 sed -i 's/"\.gitmodules":"[^"]*"/"\.gitmodules":"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"/' third_party/rust/sfv/.cargo-checksum.json
-
-# 4. Fix glslopt
+# 4. Fix glslopt (The new cause of the current build failure)
 mkdir -p third_party/rust/glslopt
 touch third_party/rust/glslopt/.gitmodules
 sed -i 's/"\.gitmodules":"[^"]*"/"\.gitmodules":"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"/' third_party/rust/glslopt/.cargo-checksum.json
-
 # 5. Fix yaml-rust2
 mkdir -p third_party/rust/yaml-rust2
 touch third_party/rust/yaml-rust2/.gitmodules
 sed -i 's/"\.gitmodules":"[^"]*"/"\.gitmodules":"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"/' third_party/rust/yaml-rust2/.cargo-checksum.json
 # -------------------------
-
 %build
-# Verify system cbindgen is available
-cbindgen --version
+# --- AUTOMATED CBINDGEN SETUP ---
+# 1. Extract the Arch Linux package (it contains usr/bin/cbindgen)
+tar --use-compress-program=unzstd -xf %{SOURCE99}
+# 2. Move binary to current folder and make executable
+cp usr/bin/cbindgen .
+chmod +x ./cbindgen
+# 3. Add to PATH
+export PATH=$PWD:$PATH
 
+echo "Using bootstrapped cbindgen version:"
+./cbindgen --version
+# -----------------------------
 # Recursion Fix: Filter flags safely using shell
 cat << EOF > .obsenv.sh
 export CFLAGS=\$(echo "%{optflags}" | sed -e 's/-flto[^ ]*//g')
@@ -128,7 +133,6 @@ export MACH_BUILD_PYTHON_NATIVE_PACKAGE_SOURCE=system
 export MOZCONFIG=$RPM_BUILD_DIR/mozconfig
 export MOZILLA_OFFICIAL=1
 export MOZ_TELEMETRY_REPORTING=1
-export MOZ_ENABLE_WAYLAND=1
 EOF
 source ./.obsenv.sh
 
@@ -158,7 +162,6 @@ ac_add_options --enable-crashreporter
 ac_add_options --enable-default-toolkit=cairo-gtk3-wayland
 ac_add_options --enable-install-strip
 ac_add_options --enable-libproxy
-ac_add_options --enable-linker=lld
 ac_add_options --disable-lto
 ac_add_options --enable-optimize
 ac_add_options --enable-release
@@ -202,9 +205,9 @@ rm %{buildroot}%{_bindir}/firefox
 ln -sf ../%{_lib}/ff-dev-edition/firefox-bin %{buildroot}%{_bindir}/firefox-aurora
 
 for size in 16 32 48 64 128; do
-  mkdir -p %{buildroot}%{_datadir}/icons/hicolor/${size}x${size}/apps
+  mkdir -p %{buildroot}%{_prefix}/share/icons/hicolor/${size}x${size}/apps
   cp %{buildroot}%{progdir}/browser/chrome/icons/default/default$size.png \
-      %{buildroot}%{_datadir}/icons/hicolor/${size}x${size}/apps/ff-dev-edition.png
+      %{buildroot}%{_prefix}/share/icons/hicolor/${size}x${size}/apps/ff-dev-edition.png
 done
 
 rm -f %{buildroot}%{progdir}/updater.ini
@@ -212,6 +215,7 @@ rm -f %{buildroot}%{progdir}/removed-files
 rm -f %{buildroot}%{progdir}/README.txt
 rm -f %{buildroot}%{progdir}/old-homepage-default.properties
 rm -f %{buildroot}%{progdir}/run-mozilla.sh
+rm -f %{buildroot}%{progdir}/LICENSE
 rm -f %{buildroot}%{progdir}/precomplete
 rm -f %{buildroot}%{progdir}/update-settings.ini
 
@@ -230,7 +234,6 @@ exit 0
 
 %files
 %defattr(-,root,root)
-%license LICENSE
 %dir %{progdir}
 %dir %{progdir}/browser/
 %dir %{progdir}/browser/chrome/
@@ -252,15 +255,7 @@ exit 0
 %{progdir}/crashhelper
 %{progdir}/crashreporter
 %{_datadir}/applications/ff-dev-edition.desktop
-%{_datadir}/icons/hicolor/
+%{_prefix}/share/icons/hicolor/
 %{_bindir}/firefox-aurora
 
 %changelog
-* Tue Apr 28 2025 itachi_re <itachi_re@opensuse.org> - 151.0b3
-- Switch cbindgen from Arch Linux binary to system rust-cbindgen BuildRequires
-- Add ExclusiveArch: x86_64
-- Fix Release tag from 0 to 1
-- Add MOZ_ENABLE_WAYLAND=1 to build environment
-- Fix icon install path to use %%{_datadir} consistently
-- Add %%license macro instead of silently deleting LICENSE
-- Remove Source99 (cbindgen Arch package) and related defines/extraction block
