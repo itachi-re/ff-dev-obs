@@ -18,7 +18,6 @@ Version:        151.0b3
 
 Source0:        https://ftp.mozilla.org/pub/devedition/releases/%{version}/source/firefox-%{version}.source.tar.xz
 Source1:        https://ftp.mozilla.org/pub/devedition/releases/%{version}/source/firefox-%{version}.source.tar.xz.asc
-###Source2:        https://ftp.mozilla.org/pub/devedition/releases/%{version}/KEY#/mozilla.keyring
 Source2: https://ftp.mozilla.org/pub/devedition/releases/%{version}/KEY#/mozilla.keyring
 Source10:       ff-dev-edition.desktop
 # Please create your own keys should you need them :)

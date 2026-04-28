@@ -1,13 +1,23 @@
 [Desktop Entry]
 Version=1.0
 Type=Application
-Exec=/usr/bin/firefox-aurora %u
-Terminal=false
-X-MultipleArgs=false
-Icon=ff-dev-edition
-StartupWMClass=ff-dev-edition
-DBusActivatable=false
-Categories=GNOME;GTK;Network;WebBrowser;
-StartupNotify=true
 Name=Firefox Developer Edition
 GenericName=Web Browser
+Comment=Browse the World Wide Web
+Exec=env MOZ_ENABLE_WAYLAND=1 /usr/bin/firefox-aurora %u
+Terminal=false
+Icon=ff-dev-edition
+StartupWMClass=ff-dev-edition
+StartupNotify=true
+DBusActivatable=false
+Categories=Network;WebBrowser;
+MimeType=text/html;text/xml;application/xhtml+xml;application/xml;application/rss+xml;application/rdf+xml;x-scheme-handler/http;x-scheme-handler/https;x-scheme-handler/ftp;
+Actions=new-window;new-private-window;
+
+[Desktop Action new-window]
+Name=Open New Window
+Exec=env MOZ_ENABLE_WAYLAND=1 /usr/bin/firefox-aurora --new-window %u
+
+[Desktop Action new-private-window]
+Name=Open New Private Window
+Exec=env MOZ_ENABLE_WAYLAND=1 /usr/bin/firefox-aurora --private-window %u

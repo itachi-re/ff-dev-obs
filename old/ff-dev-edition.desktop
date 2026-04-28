@@ -1,0 +1,13 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Exec=/usr/bin/firefox-aurora %u
+Terminal=false
+X-MultipleArgs=false
+Icon=ff-dev-edition
+StartupWMClass=ff-dev-edition
+DBusActivatable=false
+Categories=GNOME;GTK;Network;WebBrowser;
+StartupNotify=true
+Name=Firefox Developer Edition
+GenericName=Web Browser
