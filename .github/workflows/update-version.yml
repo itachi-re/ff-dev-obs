@@ -17,7 +17,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4  # v5 does not exist
+        uses: actions/checkout@v6  # v6 — Node.js 24, latest stable
 
       - name: Fetch latest version from Mozilla
         id: fetch_version
@@ -50,7 +50,6 @@ jobs:
       - name: Commit and Push
         if: env.UPDATE_NEEDED == 'true'
         run: |
-          # Plain strings — NOT markdown links
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
