@@ -244,6 +244,7 @@ exit 0
 %{progdir}/*.so
 %{progdir}/glxtest
 %{progdir}/vaapitest
+%{progdir}/vulkantest
 %{progdir}/omni.ja
 %{progdir}/fonts/
 %{progdir}/pingsender
