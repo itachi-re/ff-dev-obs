@@ -18,7 +18,8 @@ Version:        153.0b1
 
 Source0:        https://ftp.mozilla.org/pub/devedition/releases/%{version}/source/firefox-%{version}.source.tar.xz
 Source1:        https://ftp.mozilla.org/pub/devedition/releases/%{version}/source/firefox-%{version}.source.tar.xz.asc
-Source2: https://ftp.mozilla.org/pub/devedition/releases/%{version}/KEY#/mozilla.keyring
+Source2:        https://ftp.mozilla.org/pub/devedition/releases/%{version}/KEY#/mozilla.keyring
+Source3:        https://github.com/mozilla/cbindgen/releases/download/0.29.4/cbindgen#/cbindgen-0.29.4-x86_64
 Source10:       ff-dev-edition.desktop
 # Please create your own keys should you need them :)
 Source20:       google-geolocation-api-key
@@ -114,24 +115,32 @@ sed -i 's/"\.gitmodules":"[^"]*"/"\.gitmodules":"e3b0c44298fc1c149afbf4c8996fb92
 # -------------------------
 
 %build
-# Verify system cbindgen is available
-cbindgen --version
+# Firefox 153 requires cbindgen >= 0.29.4
+# Tumbleweed currently ships 0.29.2, so use the bundled binary.
+install -Dm0755 %{SOURCE3} %{_builddir}/local-bin/cbindgen
 
-# Recursion Fix: Filter flags safely using shell
+# Build environment
 cat << EOF > .obsenv.sh
+export PATH="%{_builddir}/local-bin:\$PATH"
+
 export CFLAGS=\$(echo "%{optflags}" | sed -e 's/-flto[^ ]*//g')
 export CXXFLAGS="\$CFLAGS"
 export LDFLAGS="\$LDFLAGS -fPIC -Wl,-z,relro,-z,now"
 
 export MACH_BUILD_PYTHON_NATIVE_PACKAGE_SOURCE=system
-export MOZCONFIG=$RPM_BUILD_DIR/mozconfig
+export MOZCONFIG=\$RPM_BUILD_DIR/mozconfig
 export MOZILLA_OFFICIAL=1
 export MOZ_TELEMETRY_REPORTING=1
 export MOZ_ENABLE_WAYLAND=1
 EOF
+
 source ./.obsenv.sh
 
-cat << EOF > $MOZCONFIG
+# Verify we're using the bundled cbindgen and not /usr/bin/cbindgen
+which cbindgen
+cbindgen --version
+
+cat << EOF > \$MOZCONFIG
 export MOZ_APP_REMOTINGNAME=ff-dev-edition
 
 mk_add_options BUILD_OFFICIAL=1
