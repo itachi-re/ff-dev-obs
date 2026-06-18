@@ -19,7 +19,7 @@ Version:        153.0b1
 Source0:        https://ftp.mozilla.org/pub/devedition/releases/%{version}/source/firefox-%{version}.source.tar.xz
 Source1:        https://ftp.mozilla.org/pub/devedition/releases/%{version}/source/firefox-%{version}.source.tar.xz.asc
 Source2:        https://ftp.mozilla.org/pub/devedition/releases/%{version}/KEY#/mozilla.keyring
-Source3:        https://github.com/mozilla/cbindgen/releases/download/0.29.4/cbindgen#/cbindgen-0.29.4-x86_64
+Source3:        https://github.com/mozilla/cbindgen/releases/download/0.29.4/cbindgen-ubuntu22.04#/cbindgen
 Source10:       ff-dev-edition.desktop
 # Please create your own keys should you need them :)
 Source20:       google-geolocation-api-key
@@ -44,7 +44,6 @@ BuildRequires:  python3
 BuildRequires:  python3-curses
 BuildRequires:  python3-devel
 BuildRequires:  rust
-BuildRequires:  rust-cbindgen
 BuildRequires:  sccache
 BuildRequires:  unzip
 BuildRequires:  zstd
@@ -135,12 +134,12 @@ export MOZ_ENABLE_WAYLAND=1
 EOF
 
 source ./.obsenv.sh
-
 # Verify we're using the bundled cbindgen and not /usr/bin/cbindgen
-which cbindgen
-cbindgen --version
+CBINDGEN_VERSION="$(cbindgen --version)"
+echo "Using $(which cbindgen)"
+echo "$CBINDGEN_VERSION"
 
-cat << EOF > \$MOZCONFIG
+cat << EOF > $MOZCONFIG
 export MOZ_APP_REMOTINGNAME=ff-dev-edition
 
 mk_add_options BUILD_OFFICIAL=1
