@@ -66,7 +66,10 @@ rm -rf "$GNUPGHOME"
 
 %autosetup -p1 -n firefox-%{major_version}
 
-# Fix missing GetSystemProxyDirect implementation (new in FF151 nsISystemProxySettings)
+# Fix missing GetSystemProxyDirect implementation for older Firefox versions.
+# Firefox 153 already provides this method upstream, so only inject it when
+# the implementation is actually absent.
+if ! grep -q 'GetSystemProxyDirect' toolkit/system/unixproxy/nsLibProxySettings.cpp; then
 sed -i '/^NS_IMPL_ISUPPORTS(nsUnixSystemProxySettings/i \
 NS_IMETHODIMP\
 nsUnixSystemProxySettings::GetSystemProxyDirect(bool* aSystemProxyDirect)\
@@ -75,7 +78,7 @@ nsUnixSystemProxySettings::GetSystemProxyDirect(bool* aSystemProxyDirect)\
   return NS_OK;\
 }\
 ' toolkit/system/unixproxy/nsLibProxySettings.cpp
-
+fi
 # Fix vendored Rust crates where .gitmodules is non-empty but checksum expects empty file
 find third_party/rust -name ".gitmodules" -exec truncate -s 0 {} +
 
