@@ -13,7 +13,7 @@ Group:          Productivity/Networking/Web/Browsers
 ExclusiveArch:  x86_64
 
 # --- 🦊 FIREFOX VERSION ---
-Version:        153.0b7
+Version:        153.0b8
 # --------------------------
 
 Source0:        https://ftp.mozilla.org/pub/devedition/releases/%{version}/source/firefox-%{version}.source.tar.xz
