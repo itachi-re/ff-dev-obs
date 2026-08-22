@@ -253,9 +253,7 @@ exit 0
 %{progdir}/application.ini
 %{progdir}/dependentlibs.list
 %{progdir}/*.so
-%{progdir}/glxtest
-%{progdir}/vaapitest
-%{progdir}/vulkantest
+%{progdir}/gfxtest
 %{progdir}/omni.ja
 %{progdir}/fonts/
 %{progdir}/pingsender
@@ -267,6 +265,8 @@ exit 0
 %{_bindir}/firefox-aurora
 
 %changelog
+* Sat Aug 22 2026 itachi_re <itachi_re@opensuse.org> - 155.0b3
+- Replace separate glxtest/vaapitest/vulkantest binaries with unified gfxtest binary in %%files (upstream build change)
 * Tue Apr 28 2025 itachi_re <itachi_re@opensuse.org> - 151.0b3
 - Switch cbindgen from Arch Linux binary to system rust-cbindgen BuildRequires
 - Add ExclusiveArch: x86_64
